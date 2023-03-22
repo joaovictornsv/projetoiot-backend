@@ -1,7 +1,17 @@
-import logging
 import json
 import azure.functions as func
-from .usecase import get_logs_use_case
+from lib.database import get_logs_container
+
+
+def get_logs_use_case():
+    logs_container = get_logs_container()
+
+    logs = logs_container.read_all_items(
+        max_item_count=10,
+        partition_key="id"
+    )
+
+    return list(logs)
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
