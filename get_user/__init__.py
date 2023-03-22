@@ -8,7 +8,8 @@ def get_user_use_case(user_id):
     users_container = get_users_container()
 
     users = users_container.query_items(
-        f"SELECT * FROM users u WHERE u.id = {user_id}"
+        f"SELECT * FROM users u WHERE u.id = @user_id",
+        parameters=[dict(name="@user_id", value=user_id)]
     )
 
     user_length = len(list(users))
