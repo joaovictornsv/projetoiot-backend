@@ -9,7 +9,7 @@
       "methods": [
         "get"
       ],
-      "route": "logs"
+      "route": "users/{id}"
     },
     {
       "type": "http",
