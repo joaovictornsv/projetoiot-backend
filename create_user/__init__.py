@@ -1,8 +1,8 @@
-import json
 import azure.functions as func
-from lib.database import get_users_container
-import logging
 import uuid
+import logging
+from lib.database import get_users_container
+from lib.json import to_json
 
 
 def create_user_use_case(data):
@@ -17,6 +17,6 @@ def create_user_use_case(data):
 def main(req: func.HttpRequest) -> func.HttpResponse:
     body = req.get_json()
     result = create_user_use_case(body)
-    response = json.dumps(result)
+    response = to_json(result)
 
     return func.HttpResponse(response, status_code=200)
