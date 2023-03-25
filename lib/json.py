@@ -1,3 +1,6 @@
+import json
+
+
 def to_json(data):
-    json = json.dumps(access_result)
-    return json
+    data_json = json.dumps(data)
+    return data_json

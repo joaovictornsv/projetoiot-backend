@@ -1,7 +1,28 @@
 import azure.functions as func
+from datetime import datetime
+import logging
 from lib.database import get_users_container
 from lib.json import to_json
-import logging
+from lib.service_bus import send_message_to_log_queue
+
+
+async def main(req: func.HttpRequest) -> func.HttpResponse:
+    user_id = req.route_params.get("id")
+    users = get_user_use_case(user_id)
+    result = check_user_is_allowed(users)
+
+    data_to_send = {
+        "allowed": result["allowed"],
+        "user": result["user"]
+    }
+
+    await send_log_message(data_to_send)
+
+    response = to_json({
+        "allowed": result["allowed"]
+    })
+
+    return func.HttpResponse(response, status_code=200)
 
 
 def get_user_use_case(user_id):
@@ -12,18 +33,41 @@ def get_user_use_case(user_id):
         parameters=[dict(name="@user_id", value=user_id)]
     )
 
-    user_length = len(list(users))
-    user_exists = bool(user_length)
+    user_list = list(users)
+    return user_list
 
-    result = {
-        "allowed": user_exists
+
+def check_user_is_allowed(user_list):
+    user = None
+    user_length = len(user_list)
+    user_exists = bool(user_list)
+
+    if user_exists:
+        user = user_list[0]
+
+    return {
+        "allowed": user_exists,
+        "user": user
     }
-    return result
 
 
-def main(req: func.HttpRequest) -> func.HttpResponse:
-    user_id = req.route_params.get("id")
-    access_result = get_user_use_case(user_id)
-    response = to_json(access_result)
+async def send_log_message(data):
+    message = build_message_to_send(data)
+    message_json = to_json(message)
 
-    return func.HttpResponse(response, status_code=200)
+    await send_message_to_log_queue(message_json)
+
+
+def build_message_to_send(data):
+    allowed = data["allowed"]
+    date_now = datetime.now().isoformat()
+
+    message = {
+        "allowed": allowed,
+        "date": date_now
+    }
+
+    if (allowed):
+        message["user_name"] = data["user"]["name"]
+
+    return message

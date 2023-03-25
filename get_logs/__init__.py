@@ -8,7 +8,6 @@ def get_logs_use_case():
 
     logs = logs_container.read_all_items(
         max_item_count=10,
-        partition_key="id"
     )
 
     return list(logs)
