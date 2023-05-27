@@ -39,7 +39,6 @@ def get_user_use_case(user_id):
 
 def check_user_is_allowed(user_list):
     user = None
-    user_length = len(user_list)
     user_exists = bool(user_list)
 
     if user_exists:
@@ -69,5 +68,6 @@ def build_message_to_send(data):
 
     if (allowed):
         message["user_name"] = data["user"]["name"]
+        message["user_image"] = data["user"]["profile"]
 
     return message
