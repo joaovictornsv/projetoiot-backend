@@ -2,11 +2,19 @@
   "scriptFile": "__init__.py",
   "bindings": [
     {
-      "name": "msg",
-      "type": "serviceBusTrigger",
+      "authLevel": "anonymous",
+      "type": "httpTrigger",
       "direction": "in",
-      "queueName": "sbq-access-log",
-      "connection": "SERVICE_BUS_CONNECTION"
+      "name": "req",
+      "methods": [
+        "post"
+      ],
+      "route": "logs"
+    },
+    {
+      "type": "http",
+      "direction": "out",
+      "name": "$return"
     }
   ]
 }
