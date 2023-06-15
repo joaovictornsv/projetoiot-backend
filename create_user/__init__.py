@@ -5,23 +5,18 @@ from lib.database import get_users_container
 from lib.json import to_json
 from lib.storage import upload_blob
 import re
+from lib.face_recognition import image_to_ndarray
 
 
-def create_user_use_case(data):
+def create_user_use_case(req_data):
     users_container = get_users_container()
+    data_to_save = dict()
 
-    data["id"] = str(uuid.uuid4())
+    data_to_save["id"] = str(uuid.uuid4())
+    data_to_save["image_ndarray"] = image_to_ndarray(req_data["image"])
+    data_to_save["user_name"] = req_data["user_name"]
 
-    profile_image_base64 = data["profile"]
-    filename = upload_blob(
-        data=profile_image_base64,
-        filename=data["id"],
-        container="users"
-    )
-    data["profile"] = filename
-
-    user = users_container.create_item(data)
-
+    user = users_container.create_item(data_to_save)
     return user
 
 
